@@ -23,12 +23,13 @@ class MainActivity : AppCompatActivity() {
                 Log.d("ANDROID", "許可されなかった")
             }
         }
-
+//パーミッションはボタン押下すると許可したものとみなされる（拒否がない）
     // APIレベルによって許可が必要なパーミッションを切り替える
     private val readImagesPermission =
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) android.Manifest.permission.READ_MEDIA_IMAGES
         else android.Manifest.permission.READ_EXTERNAL_STORAGE
 
+//再生・進むなどのボタンが表示されない
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -51,10 +52,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
     // 画像をボタンで表示する
+ //   private var cursor: Cursor? = null
     private fun getContentsInfo() {
-        // 画像の情報を取得する
+        // 画像の情報を取得する(cursol の初期化)
         val resolver = contentResolver
-        val cursor = resolver.query(
+  //Q：もとはvalだが、cursorは変数扱いとみなしたほうがよいか？ボタンによって内容が変わる？
+        var cursor = resolver.query(
             MediaStore.Images.Media.EXTERNAL_CONTENT_URI, // データの種類
             null, // 項目（null = 全項目）
             null, // フィルタ条件（null = フィルタなし）
@@ -62,22 +65,25 @@ class MainActivity : AppCompatActivity() {
             null // ソート (nullソートなし）
         )
 
-// 進むボタンの時、次の画像を表示（次の画像がない場合、movetonext）
-// 戻るボタンの時、前の画像を表示（前の画像がない場合、movetofirst）
-// 再生停止ボタンの時、再生か停止か判定
-// 再生中なら停止して、停止中なら再生する
+       // 進むボタンクリック時の処理（次の画像がない場合、movetonext）
+       // cursol を使って moveToNext() し、画像を表示する
+   //Q： 代入の書き方、カーソルとmovetoの記述
+        binding.startBotton.setOnClickListener {
+            cursor!!.moveToNext()
+        }
 
-        binding.button2.setOnClickListener {
-        if (cursor!!.moveToFirst()) {
-            // indexからIDを取得し、そのIDから画像のURIを取得する
-            val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
-            val id = cursor.getLong(fieldIndex)
-            val imageUri =
-                ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+        binding.resetButton.setOnClickListener {
+            // 戻るボタンクリック時の処理
+            // cursol を使って moveToPrevious() し、画像を表示する
+            // val fieldIndex = cursor.getColumnIndex(MediaStore.Images.Media._ID)
+            cursor!!.moveToPrevious()
+        }
 
-            binding.imageView.setImageURI(imageUri)
-            }
-        cursor.close()
+        binding.resetButton.setOnClickListener {
+            // 再生停止ボタンクリック時の処理
+            // cursol を使って movetoFirst() し、画像の再表示する（onCreate？）
         }
     }
+//カーソルクローズ：カーソルフェッチと対？
+   //     cursor.close()
 }

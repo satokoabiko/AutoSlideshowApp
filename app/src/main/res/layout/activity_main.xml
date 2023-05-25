@@ -15,19 +15,19 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
     <Button
-        android:id="@+id/button2"
+        android:id="@+id/startBotton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="MoveOn" />
+        android:text="startBotton" />
     <Button
-        android:id="@+id/button3"
+        android:id="@+id/resetButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Return" />
+        android:text="resetButton" />
     <Button
-        android:id="@+id/button4"
+        android:id="@+id/pauseButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Stop" />
+        android:text="pauseButton" />
 
 </LinearLayout>
