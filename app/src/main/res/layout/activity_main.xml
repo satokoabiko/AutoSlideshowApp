@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_height="match_parent">
 
     <Button
         android:id="@+id/button1"
@@ -13,21 +13,24 @@
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="400dp" />
+
     <Button
         android:id="@+id/startBotton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="startBotton" />
+        android:text="再生停止" />
+
     <Button
-        android:id="@+id/resetButton"
+        android:id="@+id/nextButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="resetButton" />
+        android:text="進む" />
+
     <Button
-        android:id="@+id/pauseButton"
+        android:id="@+id/previousButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="pauseButton" />
+        android:text="戻る" />
 
 </LinearLayout>
