@@ -9,8 +9,10 @@ import android.os.Bundle
 import android.util.Log
 import android.provider.MediaStore
 import androidx.activity.result.contract.ActivityResultContracts
-import android.view.View
+import android.os.Handler
+import android.os.Looper
 import jp.techacademy.satoko.abiko.AutoSlideshowApp.databinding.ActivityMainBinding
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) android.Manifest.permission.READ_MEDIA_IMAGES
         else android.Manifest.permission.READ_EXTERNAL_STORAGE
     private var cursor: Cursor? = null
-    //再生・進むなどのボタンが表示されない
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -58,11 +60,58 @@ class MainActivity : AppCompatActivity() {
                 requestPermissionLauncher.launch(readImagesPermission)
             }
         }
-        //再生ボタン（タイマーで動作する）
-        binding.startBotton.setOnClickListener {
-//            Log.d("ANDROID", "start")   timer
-//            cursor!!.moveToNext()
+        //画像の操作
+        lateinit var binding: ActivityMainBinding
+
+        var timer: Timer? = null
+
+        // タイマー用の時間のための変数
+        var seconds = 0.0
+        val handler = Handler(Looper.getMainLooper())
+        //再生
+ //       super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
+        binding.startButton.setOnClickListener {
+            if (timer == null) {
+                timer = Timer()
+                timer!!.schedule(object : TimerTask() {
+                    override fun run() {
+                        seconds += 2.0
+                        handler.post {
+                            binding.timer.text = String.format("%.1f", seconds)
+                        }
+                        if (cursor!!.moveToNext()) {
+                            // indexからIDを取得し、そのIDから画像のURIを取得する
+                            val fieldIndex = cursor!!.getColumnIndex(MediaStore.Images.Media._ID)
+                            val id = cursor!!.getLong(fieldIndex)
+                            val imageUri =
+                                ContentUris.withAppendedId(
+                                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+
+                            binding.imageView.setImageURI(imageUri)
+                        }
+                            //最後の場合、最初を表示する
+                        else if (cursor!!.moveToFirst()) {
+                             val fieldIndex = cursor!!.getColumnIndex(MediaStore.Images.Media._ID)
+                             val id = cursor!!.getLong(fieldIndex)
+                             val imageUri =
+                                 ContentUris.withAppendedId(
+                                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                                binding.imageView.setImageURI(imageUri)
+                             }
+                        }
+            }, 200, 200) // 最初に始動させるまで200ミリ秒、ループの間隔を200ミリ秒 に設定
         }
+
+        //停止ボタンの処理
+        binding.startButton.setOnClickListener {
+            if (timer != null) {
+                timer!!.cancel()
+                timer = null
+            }
+        }
+
         //進むボタン　
         binding.nextButton.setOnClickListener {
             if (cursor!!.moveToNext()) {
@@ -97,14 +146,15 @@ class MainActivity : AppCompatActivity() {
 
             }
           //最初の場合、最後を表示
-          else  if (cursor!!.moveToFirst()) {
+          else  if (cursor!!.moveToLast() ) {
               val fieldIndex = cursor!!.getColumnIndex(MediaStore.Images.Media._ID)
               val id = cursor!!.getLong(fieldIndex)
               val imageUri =
                   ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
 
               binding.imageView.setImageURI(imageUri)
+              }
           }
-        }
+       }
     }
 }
