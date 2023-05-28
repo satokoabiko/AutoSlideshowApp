@@ -68,7 +68,14 @@ class MainActivity : AppCompatActivity() {
         binding.startButton.setOnClickListener {
         //画像の操作
           if (playing) {
-              playing = false // 再生中フラグを落とす
+              playing = false // 再生中フラグを落とす(停止中にする)
+              // 停止ボタンの処理
+              if (timer != null){
+                  timer!!.cancel()
+                  timer = null
+              }
+          } else {
+              playing = true // 再生中フラグを上げる(再生中にする)
               if (timer == null) {
                   timer = Timer()
                   timer!!.schedule(object : TimerTask() {
@@ -97,13 +104,6 @@ class MainActivity : AppCompatActivity() {
                   }, 200, 200) // 最初に始動させるまで200ミリ秒、ループの間隔を200ミリ秒 に設定
               }
 
-          } else {
-              playing = true // 再生中フラグを上げる
-              // 停止ボタンの処理
-                 if (timer != null){
-                     timer!!.cancel()
-                     timer = null
-                 }
           }
         }
 
