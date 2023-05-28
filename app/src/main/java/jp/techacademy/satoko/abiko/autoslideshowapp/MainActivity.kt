@@ -74,11 +74,24 @@ class MainActivity : AppCompatActivity() {
                   timer!!.schedule(object : TimerTask() {
                       override fun run() {
                           handler.post {
-                              val fieldIndex = cursor!!.getColumnIndex(MediaStore.Images.Media._ID)
-                              val id = cursor!!.getLong(fieldIndex)
-                              val imageUri =
-                                  ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-                              binding.imageView.setImageURI(imageUri)
+                              if (cursor!!.moveToNext()) {
+                                  // indexからIDを取得し、そのIDから画像のURIを取得する
+                                  val fieldIndex = cursor!!.getColumnIndex(MediaStore.Images.Media._ID)
+                                  val id = cursor!!.getLong(fieldIndex)
+                                  val imageUri =
+                                      ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+
+                                  binding.imageView.setImageURI(imageUri)
+                              }
+                              //最後の場合、最初を表示する
+                              else if (cursor!!.moveToFirst()) {
+                                  val fieldIndex = cursor!!.getColumnIndex(MediaStore.Images.Media._ID)
+                                  val id = cursor!!.getLong(fieldIndex)
+                                  val imageUri =
+                                      ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+
+                                  binding.imageView.setImageURI(imageUri)
+                              }
                           }
                       }
                   }, 200, 200) // 最初に始動させるまで200ミリ秒、ループの間隔を200ミリ秒 に設定
