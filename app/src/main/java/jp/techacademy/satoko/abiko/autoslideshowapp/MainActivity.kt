@@ -36,7 +36,6 @@ class MainActivity : AppCompatActivity() {
     private var timer: Timer? = null
 
     // タイマー用の時間のための変数
-    private var seconds = 0.0
     private var handler = Handler(Looper.getMainLooper())
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,50 +64,35 @@ class MainActivity : AppCompatActivity() {
                 requestPermissionLauncher.launch(readImagesPermission)
             }
         }
+        //再生ボタン　
+        binding.startButton.setOnClickListener {
         //画像の操作
-        if (playing) {
-            playing = false // 再生中フラグを落とす
+          if (playing) {
+              playing = false // 再生中フラグを落とす
+              if (timer == null) {
+                  timer = Timer()
+                  timer!!.schedule(object : TimerTask() {
+                      override fun run() {
+                          handler.post {
+                              val fieldIndex = cursor!!.getColumnIndex(MediaStore.Images.Media._ID)
+                              val id = cursor!!.getLong(fieldIndex)
+                              val imageUri =
+                                  ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
+                              binding.imageView.setImageURI(imageUri)
+                          }
+                      }
+                  }, 200, 200) // 最初に始動させるまで200ミリ秒、ループの間隔を200ミリ秒 に設定
+              }
 
-            // 停止ボタンの処理
- //               if (timer != null) {
- //                   timer!!.cancel()
- //                   timer = null
- //               }
-
-        } else {
-            playing = true // 再生中フラグを上げる
-
-            // 再生処理
-//            if (timer == null) {
-//                timer = Timer()
-//                timer!!.schedule(object : TimerTask() {
-//                    override fun run() {
-//                        seconds += 2.0
-//                        handler.post {}
-                        if (cursor!!.moveToNext()) {
-                            // indexからIDを取得し、そのIDから画像のURIを取得する
-                            val fieldIndex = cursor!!.getColumnIndex(MediaStore.Images.Media._ID)
-                            val id = cursor!!.getLong(fieldIndex)
-                            val imageUri =
-                                ContentUris.withAppendedId(
-                                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-
-                            binding.imageView.setImageURI(imageUri)
-                        }
-                        //最後の場合、最初を表示する
-                        else if (cursor!!.moveToFirst()) {
-                            val fieldIndex = cursor!!.getColumnIndex(MediaStore.Images.Media._ID)
-                            val id = cursor!!.getLong(fieldIndex)
-                            val imageUri =
-                                ContentUris.withAppendedId(
-                                    MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id)
-                            binding.imageView.setImageURI(imageUri)
-                        }
-                    }
-//                }, 200, 200) // 最初に始動させるまで200ミリ秒、ループの間隔を200ミリ秒 に設定
-//            }
-//
- //       }
+          } else {
+              playing = true // 再生中フラグを上げる
+              // 停止ボタンの処理
+                 if (timer != null){
+                     timer!!.cancel()
+                     timer = null
+                 }
+          }
+        }
 
         //進むボタン　
         binding.nextButton.setOnClickListener {
