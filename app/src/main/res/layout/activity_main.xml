@@ -19,7 +19,7 @@
         android:id="@+id/startButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="再生停止" />
+        android:text="再生" />
 
     <Button
         android:id="@+id/nextButton"

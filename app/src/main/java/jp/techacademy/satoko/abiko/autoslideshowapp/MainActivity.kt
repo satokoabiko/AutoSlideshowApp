@@ -69,6 +69,11 @@ class MainActivity : AppCompatActivity() {
         //画像の操作
           if (playing) {
               playing = false // 再生中フラグを落とす(停止中にする)
+              // 停止⇒再生へ
+              binding.startButton.text = "再生"
+              // 他ボタンをロック
+              binding.nextButton.isEnabled = true
+              binding.previousButton.isEnabled = true
               // 停止ボタンの処理
               if (timer != null){
                   timer!!.cancel()
@@ -76,12 +81,18 @@ class MainActivity : AppCompatActivity() {
               }
           } else {
               playing = true // 再生中フラグを上げる(再生中にする)
+              // 再生⇒停止へ
+              binding.startButton.text = "停止"
+              // 他ボタンのロック解除
+              binding.nextButton.isEnabled = false
+              binding.previousButton.isEnabled = false
+
               if (timer == null) {
                   timer = Timer()
                   timer!!.schedule(object : TimerTask() {
                       override fun run() {
                           handler.post {
-                              if (cursor!!.moveToNext()) {
+                             if (cursor!!.moveToNext()) {
                                   // indexからIDを取得し、そのIDから画像のURIを取得する
                                   val fieldIndex = cursor!!.getColumnIndex(MediaStore.Images.Media._ID)
                                   val id = cursor!!.getLong(fieldIndex)
